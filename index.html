@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fff8ef">
+<title>세은·세강 칭찬 점수판</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff8ef; --card:#ffffff; --ink:#2d2a32; --muted:#8a8494; --line:#efe6da;
+  --girl:#ff6f9c; --girl-soft:#ffe6ee; --boy:#3d8bfd; --boy-soft:#e3eeff;
+  --plus:#16a96e; --plus-soft:#dcf6ea; --minus:#ec4b48; --minus-soft:#ffe3e2;
+  --accent:#ffb02e; --accent-soft:#fff3da; --radius:18px;
+  --title:'Jua',"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg)}
+body{color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;color:inherit}
+.app{max-width:520px;margin:0 auto;min-height:100vh;padding:0 16px 140px}
+.screen{display:none}
+.screen.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---------- 헤더 ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:18px 0 14px}
+.top.sticky{position:sticky;top:0;z-index:20;background:var(--bg);padding-top:14px}
+.brand{display:flex;gap:10px;align-items:center}
+.logo{width:46px;height:46px;border-radius:15px;background:var(--accent);display:grid;place-items:center;font-size:25px;box-shadow:0 4px 0 #e3931a}
+h1{font-family:var(--title);font-size:24px;margin:0;font-weight:400;line-height:1.1}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.pill-btn{border:0;background:#fff;border-radius:999px;padding:10px 14px;font-weight:800;font-size:14px;box-shadow:0 2px 0 var(--line);cursor:pointer;white-space:nowrap}
+.back{border:0;background:#fff;border-radius:999px;padding:9px 13px 9px 10px;font-weight:800;font-size:14px;box-shadow:0 2px 0 var(--line);cursor:pointer;white-space:nowrap}
+
+/* ---------- 카드 & 스텝 ---------- */
+.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:0 2px 0 var(--line),0 8px 20px rgba(90,60,20,.05)}
+.step-h{display:flex;align-items:center;gap:8px;font-weight:800;margin-bottom:12px;font-size:15px}
+.num{width:24px;height:24px;border-radius:50%;background:#f2ebe1;color:var(--muted);display:grid;place-items:center;font-size:13px;font-weight:800;flex:none;transition:.2s}
+.num.done{background:var(--plus);color:#fff}
+.step-h small{margin-left:auto;color:var(--muted);font-weight:600;font-size:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{border:2px solid var(--line);background:#fff;border-radius:14px;padding:10px 2px;font-size:14px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:transform .1s,background .15s,border-color .15s}
+.opt:active{transform:scale(.95)}
+.opt .e{font-size:26px;line-height:1.1}
+.opt.on{border-color:var(--accent);background:var(--accent-soft)}
+.opt.kid{padding:14px 4px;font-size:17px;flex-direction:row;justify-content:center;gap:8px}
+.opt.kid .e{font-size:30px}
+.opt.kid.on{border-color:var(--kc);background:var(--ks);color:var(--kc)}
+.opt.type{padding:14px 4px;font-size:18px;font-family:var(--title);font-weight:400;flex-direction:row;justify-content:center;gap:8px}
+.opt.type .e{font-size:26px}
+.opt.type.plus.on{border-color:var(--plus);background:var(--plus-soft);color:var(--plus)}
+.opt.type.minus.on{border-color:var(--minus);background:var(--minus-soft);color:var(--minus)}
+.field{width:100%;border:2px solid var(--line);background:#fff;border-radius:14px;padding:13px 14px;display:flex;align-items:center;gap:10px;font-size:16px;font-weight:800;cursor:pointer;text-align:left;min-height:56px}
+.field:active{background:#fbf7f1}
+.field .chev{margin-left:auto;color:var(--muted);font-size:22px;font-weight:400}
+.field .ph{color:var(--muted);font-weight:600}
+.field .big{font-family:var(--title);font-size:28px;font-weight:400;line-height:1}
+.field.plus{border-color:var(--plus);background:var(--plus-soft)}
+.field.minus{border-color:var(--minus);background:var(--minus-soft)}
+.plus-c{color:var(--plus)} .minus-c{color:var(--minus)} .zero-c{color:var(--ink)}
+.hint{color:var(--muted);font-size:14px;background:#faf6f0;border-radius:12px;padding:14px;text-align:center}
+.chips{display:flex;flex-direction:column;gap:8px}
+.chip{border:2px solid var(--line);background:#fff;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;cursor:pointer;text-align:left;transition:.15s}
+.chip .e{font-size:20px;width:26px;text-align:center}
+.chip .ck{margin-left:auto;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);flex:none;display:grid;place-items:center;font-size:12px;color:#fff}
+.chip.on.plus{border-color:var(--plus);background:var(--plus-soft)}
+.chip.on.minus{border-color:var(--minus);background:var(--minus-soft)}
+.chip.on.plus .ck{background:var(--plus);border-color:var(--plus)}
+.chip.on.minus .ck{background:var(--minus);border-color:var(--minus)}
+.etc-input{display:none;margin-top:10px;width:100%;border:2px solid var(--accent);border-radius:12px;padding:13px;font-size:16px;font-family:inherit;outline:none;background:#fffdf8}
+.etc-input.show{display:block}
+
+/* ---------- 하단 반영 버튼 ---------- */
+.submit-bar{position:fixed;left:0;right:0;bottom:0;z-index:30;padding:20px 16px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(rgba(255,248,239,0),var(--bg) 35%)}
+.submit-inner{max-width:488px;margin:0 auto}
+.preview{font-size:13px;color:var(--muted);text-align:center;margin-bottom:8px;min-height:18px;font-weight:700}
+.submit{width:100%;border:0;border-radius:16px;padding:16px;font-size:21px;font-family:var(--title);background:var(--accent);color:#fff;box-shadow:0 5px 0 #df8f14;cursor:pointer;transition:transform .08s,box-shadow .08s,opacity .2s}
+.submit:active{transform:translateY(4px);box-shadow:0 1px 0 #df8f14}
+.submit.dim{opacity:.5}
+body:not([data-screen="input"]) .submit-bar{display:none}
+
+/* ---------- 통계 화면 ---------- */
+.seg{display:flex;background:#fff;border-radius:999px;padding:4px;box-shadow:0 2px 0 var(--line);flex:none}
+.seg button{border:0;background:none;padding:8px 12px;border-radius:999px;font-weight:800;font-size:14px;color:var(--muted);cursor:pointer;transition:.15s;white-space:nowrap}
+.seg button.on[data-k="seeun"]{background:var(--girl);color:#fff}
+.seg button.on[data-k="segang"]{background:var(--boy);color:#fff}
+.seg button.on[data-k="all"]{background:var(--accent);color:#fff}
+
+.hero{display:flex;align-items:center;gap:16px;background:var(--ks);border-radius:22px;padding:18px;margin-bottom:12px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.45)}
+.avatar{position:relative;width:84px;height:84px;border-radius:50%;border:4px solid #fff;background:#fff;display:grid;place-items:center;font-size:44px;flex:none;cursor:pointer;padding:0;box-shadow:0 4px 0 rgba(0,0,0,.06);z-index:1}
+.avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.avatar.has-img .emo{display:none}
+.avatar .cam{position:absolute;right:-4px;bottom:-4px;width:30px;height:30px;border-radius:50%;background:var(--kc);color:#fff;font-size:14px;display:grid;place-items:center;border:3px solid #fff}
+.avatar.sm{width:64px;height:64px;font-size:34px;cursor:inherit}
+.hero-info{z-index:1;min-width:0}
+.hero-name{font-family:var(--title);font-size:24px;color:var(--kc)}
+.hero-label{font-size:12px;color:var(--muted);font-weight:700;margin-top:2px}
+.hero-total{font-family:var(--title);font-size:46px;line-height:1.05}
+.hero-total small{font-size:20px;margin-left:2px}
+.mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.mini-stats>div{background:#fff;border-radius:14px;padding:12px 8px;text-align:center;box-shadow:0 2px 0 var(--line)}
+.mini-stats b{display:block;font-family:var(--title);font-weight:400;font-size:22px}
+.mini-stats span{font-size:12px;color:var(--muted);font-weight:700}
+.tip{font-size:13px;color:#8b6a2b;background:var(--accent-soft);border-radius:12px;padding:10px 12px;margin-bottom:16px;font-weight:600}
+.sec-title{display:flex;align-items:baseline;gap:8px;font-family:var(--title);font-weight:400;font-size:19px;margin:6px 2px 10px}
+.sec-title span{font-family:inherit;font-size:13px;color:var(--muted)}
+body .sec-title span{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-weight:700}
+.day{margin-bottom:14px}
+.day-h{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:800;color:var(--muted);padding:0 4px 6px}
+.day-h em{font-style:normal}
+.rec{display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:16px;padding:12px;margin-bottom:8px;box-shadow:0 2px 0 var(--line)}
+.rec.flash{animation:flash 1.6s ease}
+@keyframes flash{0%,30%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:0 2px 0 var(--line)}}
+.pts{flex:none;width:58px;height:58px;border-radius:14px;display:grid;place-items:center;font-family:var(--title);font-size:22px}
+.pts.plus{background:var(--plus-soft);color:var(--plus)}
+.pts.minus{background:var(--minus-soft);color:var(--minus)}
+.rec-main{flex:1;min-width:0;padding-top:2px}
+.rec-reason{font-weight:800;font-size:15px;word-break:keep-all;overflow-wrap:anywhere}
+.rec-meta{font-size:12px;color:var(--muted);margin-top:4px;font-weight:600}
+.thumbs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.thumb{width:64px;height:64px;border-radius:10px;overflow:hidden;border:0;padding:0;background:#f2ece4;cursor:zoom-in}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.rec-act{display:flex;flex-direction:column;gap:6px;flex:none}
+.mini{border:0;border-radius:10px;padding:7px 9px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap}
+.mini.cam{background:var(--accent-soft);color:#9a6512}
+.mini.del{background:#f5f1ec;color:var(--muted)}
+.empty{text-align:center;padding:40px 16px;color:var(--muted)}
+.empty .big{font-size:52px}
+.empty p{font-weight:700}
+
+/* ---------- 비교 화면 ---------- */
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:10px}
+.vs-card{position:relative;border:3px solid transparent;background:var(--ks);border-radius:22px;padding:18px 8px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:transform .1s}
+.vs-card:active{transform:scale(.97)}
+.vs-card.lead{border-color:var(--kc)}
+.crown{position:absolute;top:-18px;font-size:30px;animation:bob 1.6s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-4px) rotate(-6deg)}}
+.vs-name{font-family:var(--title);font-size:20px;color:var(--kc);margin-top:4px}
+.vs-total{font-family:var(--title);font-size:40px;line-height:1}
+.vs-total small{font-size:17px}
+.vs-sub{font-size:12px;color:var(--muted);font-weight:700}
+.vs-mid{font-family:var(--title);font-size:20px;color:var(--muted)}
+.verdict{text-align:center;font-family:var(--title);font-size:19px;background:#fff;border-radius:16px;padding:12px;margin-bottom:14px;box-shadow:0 2px 0 var(--line)}
+.bf-legend{display:flex;justify-content:space-between;font-size:13px;font-weight:800;margin:0 4px 10px}
+.bf-row{display:grid;grid-template-columns:1fr 86px 1fr;align-items:center;gap:6px;margin-bottom:12px}
+.bf-side{display:flex;align-items:center;gap:6px}
+.bf-side.l{flex-direction:row}
+.bf-track{flex:1;height:22px;background:#f4eee6;border-radius:8px;display:flex;overflow:hidden}
+.bf-side.l .bf-track{justify-content:flex-end}
+.bf-bar{height:100%;border-radius:8px;transition:width .6s cubic-bezier(.2,.8,.2,1);min-width:0}
+.bf-val{font-family:var(--title);font-size:17px;min-width:34px;text-align:center}
+.bf-label{text-align:center;font-size:12px;font-weight:800;color:var(--muted);line-height:1.2}
+.mini-kid{display:inline-block;font-size:11px;font-weight:800;color:#fff;border-radius:6px;padding:2px 6px;margin-right:4px;vertical-align:1px}
+
+/* ---------- 모달 ---------- */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(40,30,20,.45);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal.show{opacity:1;pointer-events:auto}
+.sheet{width:100%;max-width:520px;background:#fff;border-radius:24px 24px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));transform:translateY(30px);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.modal.show .sheet{transform:none}
+.modal.center{align-items:center;padding:16px}
+.modal.center .sheet{border-radius:22px;max-width:360px;padding:22px 18px 18px}
+.sheet-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sheet-h b{font-family:var(--title);font-weight:400;font-size:20px}
+.x{border:0;background:#f4efe8;width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer}
+
+/* 키패드 */
+.pad-display{display:flex;align-items:baseline;justify-content:center;gap:4px;border-radius:18px;padding:14px;margin-bottom:10px;font-family:var(--title)}
+.pad-display.plus{background:var(--plus-soft);color:var(--plus)}
+.pad-display.minus{background:var(--minus-soft);color:var(--minus)}
+.pad-display .v{font-size:56px;line-height:1}
+.pad-display .s{font-size:40px}
+.pad-display .u{font-size:22px;margin-left:4px}
+.quick{display:flex;gap:6px;margin-bottom:10px}
+.quick button{flex:1;border:0;background:#f6f1ea;border-radius:12px;padding:10px 0;font-weight:800;font-size:15px;cursor:pointer}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.pad button{border:0;background:#faf6f0;border-radius:16px;height:58px;font-size:26px;font-family:var(--title);cursor:pointer;box-shadow:0 3px 0 var(--line);transition:transform .06s}
+.pad button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line);background:#f1eadf}
+.pad button.fn{font-size:17px;color:var(--muted);font-family:inherit;font-weight:800}
+.ok{width:100%;border:0;border-radius:16px;padding:15px;font-size:19px;font-family:var(--title);color:#fff;background:var(--accent);box-shadow:0 4px 0 #df8f14;cursor:pointer}
+.ok.plus{background:var(--plus);box-shadow:0 4px 0 #0f8657}
+.ok.minus{background:var(--minus);box-shadow:0 4px 0 #c43532}
+
+/* 달력 */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-nav b{font-family:var(--title);font-weight:400;font-size:21px}
+.cal-nav button{border:0;background:#f4efe8;width:40px;height:40px;border-radius:12px;font-size:20px;cursor:pointer}
+.cal-nav button:disabled{opacity:.3;cursor:default}
+.cal-wk,.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal-wk span{font-size:12px;font-weight:800;color:var(--muted);padding:4px 0}
+.cal-wk span:first-child,.cd.sun{color:var(--minus)}
+.cal-wk span:last-child,.cd.sat{color:var(--boy)}
+.cd{position:relative;border:0;background:none;aspect-ratio:1;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;max-height:48px}
+.cd:hover:not(:disabled){background:#f6f1ea}
+.cd.today{box-shadow:inset 0 0 0 2px var(--accent)}
+.cd.sel{background:var(--accent)!important;color:#fff!important}
+.cd:disabled{opacity:.28;cursor:default}
+.cd i{position:absolute;left:50%;bottom:5px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--plus)}
+.cd.sel i{background:#fff}
+.cal-foot{display:flex;gap:8px;margin-top:12px}
+.cal-foot button{flex:1;border:0;border-radius:14px;padding:13px;font-weight:800;font-size:15px;cursor:pointer;background:#f4efe8}
+
+/* 확인창 */
+.ask-msg{text-align:center;font-weight:700;font-size:16px;line-height:1.5;margin:4px 0 18px;white-space:pre-line}
+.ask-btns{display:flex;gap:8px}
+.ask-btns button{flex:1;border:0;border-radius:14px;padding:14px;font-weight:800;font-size:16px;cursor:pointer;background:#f4efe8}
+.ask-btns .danger{background:var(--minus);color:#fff}
+
+/* 사진 보기 */
+.lightbox{position:fixed;inset:0;z-index:60;background:rgba(10,8,6,.92);display:none;flex-direction:column;align-items:center;justify-content:center;padding:16px}
+.lightbox.show{display:flex}
+.lightbox img{max-width:100%;max-height:calc(100vh - 120px);border-radius:12px;object-fit:contain}
+.lb-btns{display:flex;gap:10px;margin-top:14px}
+.lb-btns button{border:0;border-radius:999px;padding:12px 20px;font-weight:800;font-size:15px;cursor:pointer;background:#fff}
+.lb-btns .danger{background:var(--minus);color:#fff}
+
+/* 토스트 */
+.toast{position:fixed;left:50%;top:18px;z-index:80;transform:translate(-50%,-20px);background:var(--ink);color:#fff;padding:12px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:.25s;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.loading{position:fixed;inset:0;z-index:70;background:rgba(255,248,239,.7);display:none;align-items:center;justify-content:center;font-weight:800}
+.loading.show{display:flex}
+
+@media (max-width:370px){
+  .seg button{padding:8px 9px;font-size:13px}
+  .opt{font-size:13px}
+  .hero-total{font-size:40px}
+}
+</style>
+</head>
+<body data-screen="input">
+<div class="app">
+
+  <!-- ================= 입력 화면 ================= -->
+  <section class="screen active" id="screen-input">
+    <header class="top">
+      <div class="brand">
+        <div class="logo">⭐</div>
+        <div><h1>칭찬 점수판</h1><p>세은 · 세강의 상점 / 감점</p></div>
+      </div>
+      <button class="pill-btn" onclick="openStats(form.child || 'all')">📊 점수 보기</button>
+    </header>
+
+    <div class="card">
+      <div class="step-h"><span class="num" id="n1">1</span>누가 주나요?</div>
+      <div class="grid4" id="giverBtns"></div>
+    </div>
+
+    <div class="card">
+      <div class="step-h"><span class="num" id="n2">2</span>누구에게 주나요?</div>
+      <div class="grid2" id="kidBtns"></div>
+    </div>
+
+    <div class="card">
+      <div class="step-h"><span class="num done" id="n3">✓</span>날짜</div>
+      <button class="field" onclick="openCal()"><span>📅</span><span id="dateText"></span><span class="chev">›</span></button>
+    </div>
+
+    <div class="card">
+      <div class="step-h"><span class="num" id="n4">4</span>상점 / 감점</div>
+      <div class="grid2">
+        <button class="opt type plus" id="tPlus" onclick="setF('type','plus')"><span class="e">😊</span>상점</button>
+        <button class="opt type minus" id="tMinus" onclick="setF('type','minus')"><span class="e">😢</span>감점</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="step-h"><span class="num" id="n5">5</span>이유</div>
+      <div id="reasonBox"></div>
+      <input class="etc-input" id="etcInput" type="text" maxlength="60" placeholder="이유를 직접 입력해 주세요" oninput="form.etc=this.value;renderChecks()">
+    </div>
+
+    <div class="card">
+      <div class="step-h"><span class="num" id="n6">6</span>점수</div>
+      <button class="field" id="scoreField" onclick="openPad()"></button>
+    </div>
+  </section>
+
+  <!-- ================= 통계 화면 ================= -->
+  <section class="screen" id="screen-stats">
+    <header class="top sticky">
+      <button class="back" onclick="goInput()">‹ 입력</button>
+      <div class="seg" id="kidSeg">
+        <button data-k="seeun" onclick="openStats('seeun')">이세은</button>
+        <button data-k="segang" onclick="openStats('segang')">이세강</button>
+        <button data-k="all" onclick="openStats('all')">모두</button>
+      </div>
+    </header>
+    <div id="statsBody"></div>
+  </section>
+</div>
+
+<!-- 하단 점수 반영 -->
+<div class="submit-bar">
+  <div class="submit-inner">
+    <div class="preview" id="preview"></div>
+    <button class="submit dim" id="submitBtn" onclick="submitScore()">점수 반영</button>
+  </div>
+</div>
+
+<!-- 숫자 키패드 -->
+<div class="modal" id="padModal" onclick="if(event.target===this)closeModal('padModal')">
+  <div class="sheet">
+    <div class="sheet-h"><b id="padTitle">점수 입력</b><button class="x" onclick="closeModal('padModal')">✕</button></div>
+    <div class="pad-display" id="padDisplay"><span class="s" id="padSign">+</span><span class="v" id="padVal">0</span><span class="u">점</span></div>
+    <div class="quick" id="padQuick"></div>
+    <div class="pad">
+      <button onclick="padKey('1')">1</button><button onclick="padKey('2')">2</button><button onclick="padKey('3')">3</button>
+      <button onclick="padKey('4')">4</button><button onclick="padKey('5')">5</button><button onclick="padKey('6')">6</button>
+      <button onclick="padKey('7')">7</button><button onclick="padKey('8')">8</button><button onclick="padKey('9')">9</button>
+      <button class="fn" onclick="padKey('C')">지움</button><button onclick="padKey('0')">0</button><button class="fn" onclick="padKey('B')">⌫</button>
+    </div>
+    <button class="ok" id="padOk" onclick="padOk()">확인</button>
+  </div>
+</div>
+
+<!-- 달력 -->
+<div class="modal" id="calModal" onclick="if(event.target===this)closeModal('calModal')">
+  <div class="sheet">
+    <div class="cal-nav">
+      <button onclick="calMove(-1)" aria-label="이전 달">‹</button>
+      <b id="calTitle"></b>
+      <button id="calNext" onclick="calMove(1)" aria-label="다음 달">›</button>
+    </div>
+    <div class="cal-wk"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-foot">
+      <button onclick="pickDate(todayStr())">오늘로</button>
+      <button onclick="closeModal('calModal')">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 확인창 -->
+<div class="modal center" id="askModal">
+  <div class="sheet">
+    <div class="ask-msg" id="askMsg"></div>
+    <div class="ask-btns"><button onclick="answer(false)">취소</button><button class="danger" id="askOk" onclick="answer(true)">삭제</button></div>
+  </div>
+</div>
+
+<!-- 사진 크게 보기 -->
+<div class="lightbox" id="lightbox" onclick="if(event.target===this)closeLightbox()">
+  <img id="lbImg" alt="사진">
+  <div class="lb-btns"><button class="danger" onclick="deletePhoto()">🗑 사진 삭제</button><button onclick="closeLightbox()">닫기</button></div>
+</div>
+
+<input type="file" id="photoInput" accept="image/*" multiple hidden>
+<input type="file" id="profileInput" accept="image/*" hidden>
+<div class="toast" id="toast"></div>
+<div class="loading" id="loading">사진 저장 중…</div>
+
+<script>
+/* ================= 기본 데이터 ================= */
+const KIDS = {
+  seeun:  { name:'이세은', short:'세은', emoji:'👧', c:'#ff6f9c', soft:'#ffe6ee' },
+  segang: { name:'이세강', short:'세강', emoji:'👦', c:'#3d8bfd', soft:'#e3eeff' }
+};
+const GIVERS = [['아빠','👨'],['엄마','👩'],['할머니','👵'],['할아버지','👴']];
+const REASONS = {
+  plus:  [['공부, 숙제를 열심히 함','📚'],['독서를 잘함','📖'],['바른말 고운말 사용, 인사를 잘함','🙇'],['가족과 화목하게 지냄','🏡'],['양치 및 목욕을 잘함','🪥'],['식사를 잘함','🍚'],['기타 (직접 입력)','✏️']],
+  minus: [['공부, 숙제를 잘 안함','📚'],['독서를 안함','📖'],['바른말 고운말 사용 안함, 인사를 잘 안함','🙅'],['가족과 화목하게 지내지 않음','💢'],['양치 및 목욕을 잘하지 않음','🦠'],['식사를 잘 안함','🍚'],['기타 (직접 입력)','✏️']]
+};
+const ETC = '기타 (직접 입력)';
+const LS_KEY = 'kidscore.records.v1', LS_GIVER = 'kidscore.lastGiver';
+
+const $ = s => document.querySelector(s);
+const pad2 = n => String(n).padStart(2,'0');
+const ymd = (y,m,d) => `${y}-${pad2(m+1)}-${pad2(d)}`;
+function todayStr(){ const d=new Date(); return ymd(d.getFullYear(), d.getMonth(), d.getDate()); }
+const WD = ['일','월','화','수','목','금','토'];
+function fmtDateLong(s){ const [y,m,d]=s.split('-').map(Number); const w=new Date(y,m-1,d).getDay(); return `${y}년 ${m}월 ${d}일 (${WD[w]})`; }
+function fmtTime(t){ const d=new Date(t); let h=d.getHours(); const ap=h<12?'오전':'오후'; h=h%12||12; return `${ap} ${h}:${pad2(d.getMinutes())}`; }
+const signed = n => (n>0?'+':'') + n;
+const cls = n => n>0?'plus-c':(n<0?'minus-c':'zero-c');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const giverEmoji = g => (GIVERS.find(x=>x[0]===g)||['','🙂'])[1];
+
+/* ================= 저장소 ================= */
+let records = [];
+try { records = JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch(e) { records = []; }
+function saveRecords(){
+  try { localStorage.setItem(LS_KEY, JSON.stringify(records)); }
+  catch(e){ toast('저장하지 못했어요. 브라우저 저장 공간을 확인해 주세요.'); }
+}
+
+// 사진은 용량이 커서 IndexedDB에 저장 (실패 시 메모리에만 보관)
+const PhotoDB = (() => {
+  let dbp = null; const mem = new Map();
+  function open(){
+    if (dbp) return dbp;
+    dbp = new Promise(res => {
+      try {
+        const r = indexedDB.open('kidscore-photos', 1);
+        r.onupgradeneeded = () => r.result.createObjectStore('p');
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => res(null);
+      } catch(e){ res(null); }
+    });
+    return dbp;
+  }
+  async function tx(mode, fn){
+    const db = await open(); if (!db) return null;
+    return new Promise((res, rej) => {
+      const t = db.transaction('p', mode); const req = fn(t.objectStore('p'));
+      t.oncomplete = () => res(req && req.result); t.onerror = () => rej(t.error);
+    });
+  }
+  return {
+    async put(k,v){ mem.set(k,v); await tx('readwrite', s => s.put(v,k)); },
+    async get(k){ if (mem.has(k)) return mem.get(k); const v = await tx('readonly', s => s.get(k)).catch(()=>null); if (v) mem.set(k,v); return v; },
+    async del(k){ mem.delete(k); await tx('readwrite', s => s.delete(k)).catch(()=>{}); }
+  };
+})();
+
+function compressImage(file, max, q){
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file); const img = new Image();
+    img.onload = () => {
+      let w = img.naturalWidth, h = img.naturalHeight; const s = Math.min(1, max/Math.max(w,h));
+      w = Math.round(w*s); h = Math.round(h*s);
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg', q));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('image')); };
+    img.src = url;
+  });
+}
+
+/* ================= 입력 폼 ================= */
+let lastGiver = null; try { lastGiver = localStorage.getItem(LS_GIVER); } catch(e){}
+const form = { giver:lastGiver, child:null, date:todayStr(), type:null, score:'', reason:null, etc:'' };
+let view = { kid:'seeun' }, lastAdded = null;
+
+function setF(key, val){
+  form[key] = val;
+  if (key === 'type'){ form.reason = null; form.etc = ''; $('#etcInput').value = ''; }
+  if (key === 'giver'){ try { localStorage.setItem(LS_GIVER, val); } catch(e){} }
+  renderForm();
+  if (key === 'reason' && val === ETC) setTimeout(() => $('#etcInput').focus(), 50);
+}
+
+function renderForm(){
+  $('#giverBtns').innerHTML = GIVERS.map(([g,e]) =>
+    `<button class="opt ${form.giver===g?'on':''}" onclick="setF('giver','${g}')"><span class="e">${e}</span>${g}</button>`).join('');
+  $('#kidBtns').innerHTML = Object.entries(KIDS).map(([k,v]) =>
+    `<button class="opt kid ${form.child===k?'on':''}" style="--kc:${v.c};--ks:${v.soft}" onclick="setF('child','${k}')"><span class="e">${v.emoji}</span>${v.name}</button>`).join('');
+  $('#dateText').textContent = fmtDateLong(form.date) + (form.date === todayStr() ? ' · 오늘' : '');
+  $('#tPlus').classList.toggle('on', form.type === 'plus');
+  $('#tMinus').classList.toggle('on', form.type === 'minus');
+
+  const sf = $('#scoreField');
+  sf.className = 'field' + (form.score && form.type ? ' ' + form.type : '');
+  if (form.score && form.type){
+    const sign = form.type === 'plus' ? '+' : '-';
+    sf.innerHTML = `<span>🔢</span><span class="big ${form.type}-c">${sign}${form.score}</span><span style="font-weight:800">점</span><span class="chev">›</span>`;
+  } else {
+    sf.innerHTML = `<span>🔢</span><span class="ph">${form.type ? '눌러서 점수 입력' : '상점/감점을 먼저 선택하세요'}</span><span class="chev">›</span>`;
+  }
+
+  if (!form.type){
+    $('#reasonBox').innerHTML = `<div class="hint">상점 또는 감점을 먼저 선택하면 이유가 나와요</div>`;
+  } else {
+    $('#reasonBox').innerHTML = `<div class="chips">` + REASONS[form.type].map(([r,e]) =>
+      `<button class="chip ${form.type} ${form.reason===r?'on':''}" onclick="setF('reason','${r}')"><span class="e">${e}</span>${r}<span class="ck">✓</span></button>`).join('') + `</div>`;
+  }
+  $('#etcInput').classList.toggle('show', form.reason === ETC);
+  renderChecks();
+}
+
+function finalReason(){ return form.reason === ETC ? form.etc.trim() : form.reason; }
+
+function renderChecks(){
+  const done = [!!form.giver, !!form.child, true, !!form.type, !!finalReason(), !!form.score];
+  done.forEach((d,i) => { const n = $('#n'+(i+1)); n.classList.toggle('done', d); n.textContent = d ? '✓' : (i+1); });
+  const all = done.every(Boolean);
+  $('#submitBtn').classList.toggle('dim', !all);
+  let p = '';
+  if (form.child){
+    p = `${form.giver ? form.giver + ' → ' : ''}${KIDS[form.child].name}`;
+    if (form.type) p += ` · ${form.type==='plus'?'상점':'감점'}`;
+    if (form.type && form.score) p += ` ${form.type==='plus'?'+':'-'}${form.score}점`;
+  } else p = '항목을 모두 선택하면 점수를 반영할 수 있어요';
+  $('#preview').textContent = p;
+}
+
+function submitScore(){
+  if (!form.giver) return toast('1. 입력자를 선택해 주세요');
+  if (!form.child) return toast('2. 아이를 선택해 주세요');
+  if (!form.type)  return toast('4. 상점 / 감점을 선택해 주세요');
+  if (!form.reason) return toast('5. 이유를 선택해 주세요');
+  const reason = finalReason();
+  if (!reason){ toast('기타 이유를 직접 입력해 주세요'); return $('#etcInput').focus(); }
+  const n = parseInt(form.score, 10);
+  if (!n) { toast('6. 점수를 입력해 주세요'); return openPad(); }
+
+  const rec = { id:uid(), child:form.child, giver:form.giver, date:form.date, type:form.type,
+                points: form.type === 'plus' ? n : -n, reason, createdAt:Date.now(), photos:[] };
+  records.push(rec); saveRecords(); lastAdded = rec.id;
+  const k = form.child;
+  toast(`${KIDS[k].short}에게 ${signed(rec.points)}점 반영했어요! ${rec.points>0?'🎉':'💪'}`);
+  form.type = null; form.score = ''; form.reason = null; form.etc = ''; $('#etcInput').value = '';
+  renderForm();
+  openStats(k);
+}
+
+/* ================= 숫자 키패드 ================= */
+let padBuf = '';
+function openPad(){
+  if (!form.type){ toast('상점 / 감점을 먼저 선택해 주세요'); return; }
+  padBuf = form.score; renderPad(); openModal('padModal');
+}
+function padKey(k){
+  if (k === 'C') padBuf = '';
+  else if (k === 'B') padBuf = padBuf.slice(0,-1);
+  else if (k.startsWith('=')) padBuf = k.slice(1);
+  else { if (padBuf === '0') padBuf = ''; if (padBuf.length < 3) padBuf += k; }
+  renderPad();
+}
+function renderPad(){
+  const t = form.type;
+  $('#padTitle').textContent = t === 'plus' ? '상점 점수 입력' : '감점 점수 입력';
+  $('#padDisplay').className = 'pad-display ' + t;
+  $('#padSign').textContent = t === 'plus' ? '+' : '-';
+  $('#padVal').textContent = padBuf || '0';
+  $('#padOk').className = 'ok ' + t;
+  $('#padQuick').innerHTML = [1,2,3,5,10].map(v => `<button onclick="padKey('=${v}')">${t==='plus'?'+':'-'}${v}</button>`).join('');
+}
+function padOk(){
+  const n = parseInt(padBuf || '0', 10);
+  if (!n){ toast('1점 이상 입력해 주세요'); return; }
+  form.score = String(n); closeModal('padModal'); renderForm();
+}
+
+/* ================= 달력 ================= */
+let calY, calM;
+function openCal(){ const [y,m] = form.date.split('-').map(Number); calY = y; calM = m-1; renderCal(); openModal('calModal'); }
+function calMove(d){ calM += d; if (calM < 0){ calM = 11; calY--; } if (calM > 11){ calM = 0; calY++; } renderCal(); }
+function renderCal(){
+  $('#calTitle').textContent = `${calY}년 ${calM+1}월`;
+  const now = new Date(), today = todayStr();
+  $('#calNext').disabled = calY > now.getFullYear() || (calY === now.getFullYear() && calM >= now.getMonth());
+  const first = new Date(calY, calM, 1).getDay(), days = new Date(calY, calM+1, 0).getDate();
+  const has = new Set(records.map(r => r.date));
+  let h = '';
+  for (let i = 0; i < first; i++) h += '<span></span>';
+  for (let d = 1; d <= days; d++){
+    const ds = ymd(calY, calM, d), w = (first + d - 1) % 7;
+    const c = ['cd', w===0?'sun':'', w===6?'sat':'', ds===today?'today':'', ds===form.date?'sel':''].join(' ');
+    h += `<button class="${c}" ${ds>today?'disabled':''} onclick="pickDate('${ds}')">${d}${has.has(ds)?'<i></i>':''}</button>`;
+  }
+  $('#calGrid').innerHTML = h;
+}
+function pickDate(ds){ form.date = ds; closeModal('calModal'); renderForm(); }
+
+/* ================= 화면 전환 ================= */
+function show(name){
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === 'screen-' + name));
+  document.body.dataset.screen = name;
+  window.scrollTo(0,0);
+}
+function goInput(){ lastAdded = null; show('input'); renderForm(); }
+function openStats(k){ view.kid = k; show('stats'); renderStats(); }
+
+function calc(k){
+  const ym = todayStr().slice(0,7);
+  const o = { total:0, plus:0, minus:0, plusN:0, minusN:0, month:0 };
+  records.filter(r => r.child === k).forEach(r => {
+    o.total += r.points;
+    if (r.points > 0){ o.plus += r.points; o.plusN++; } else { o.minus += r.points; o.minusN++; }
+    if (r.date.slice(0,7) === ym) o.month += r.points;
+  });
+  return o;
+}
+const byRecent = (a,b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt;
+
+function renderStats(){
+  document.querySelectorAll('#kidSeg button').forEach(b => b.classList.toggle('on', b.dataset.k === view.kid));
+  $('#statsBody').innerHTML = view.kid === 'all' ? renderAll() : renderChild(view.kid);
+  hydratePhotos();
+  if (lastAdded){ const el = document.getElementById('rec-' + lastAdded); if (el) setTimeout(()=>el.scrollIntoView({behavior:'smooth', block:'center'}), 200); }
+}
+
+function avatarHtml(k, small){
+  const v = KIDS[k];
+  return `<span class="avatar ${small?'sm':''}" style="--kc:${v.c}" ${small?'':`role="button" onclick="pickProfile('${k}')" title="프로필 사진 바꾸기"`}>
+    <img data-pid="profile-${k}" alt="" hidden><span class="emo">${v.emoji}</span>${small?'':'<span class="cam">📷</span>'}</span>`;
+}
+
+function renderChild(k){
+  const v = KIDS[k], s = calc(k);
+  const rs = records.filter(r => r.child === k).sort(byRecent);
+  let h = `
+  <div class="hero" style="--kc:${v.c};--ks:${v.soft}">
+    ${avatarHtml(k)}
+    <div class="hero-info">
+      <div class="hero-name">${v.name}</div>
+      <div class="hero-label">현재 점수</div>
+      <div class="hero-total ${cls(s.total)}">${signed(s.total)}<small>점</small></div>
+    </div>
+  </div>
+  <div class="mini-stats">
+    <div><b class="plus-c">+${s.plus}</b><span>상점 ${s.plusN}회</span></div>
+    <div><b class="minus-c">${s.minus}</b><span>감점 ${s.minusN}회</span></div>
+    <div><b class="${cls(s.month)}">${signed(s.month)}</b><span>이번 달</span></div>
+  </div>
+  <div class="tip">📷 기록마다 <b>사진</b> 버튼으로 사진을 올릴 수 있어요. 동그란 얼굴을 누르면 프로필 사진을 바꿔요.</div>
+  <h3 class="sec-title">점수 기록 <span>${rs.length}건 · 최근 순</span></h3>`;
+
+  if (!rs.length){
+    return h + `<div class="empty"><div class="big">🌱</div><p>아직 기록이 없어요</p><button class="pill-btn" onclick="form.child='${k}';goInput()">✏️ 점수 주러 가기</button></div>`;
+  }
+  let cur = null;
+  rs.forEach(r => {
+    if (r.date !== cur){
+      if (cur) h += '</div>';
+      cur = r.date;
+      const dt = rs.filter(x => x.date === cur).reduce((a,x) => a + x.points, 0);
+      h += `<div class="day"><div class="day-h"><span>${fmtDateLong(cur)}${cur===todayStr()?' · 오늘':''}</span><em class="${cls(dt)}">${signed(dt)}점</em></div>`;
+    }
+    h += recHtml(r);
+  });
+  return h + '</div>';
+}
+
+function recHtml(r){
+  const photos = r.photos || [];
+  return `<div class="rec ${r.id===lastAdded?'flash':''}" id="rec-${r.id}">
+    <div class="pts ${r.points>0?'plus':'minus'}">${signed(r.points)}</div>
+    <div class="rec-main">
+      <div class="rec-reason">${esc(r.reason)}</div>
+      <div class="rec-meta">${giverEmoji(r.giver)} ${esc(r.giver)} · ${fmtTime(r.createdAt)} 입력</div>
+      ${photos.length ? `<div class="thumbs">${photos.map(p => `<button class="thumb" onclick="viewPhoto('${r.id}','${p}')"><img data-pid="${p}" alt="사진"></button>`).join('')}</div>` : ''}
+    </div>
+    <div class="rec-act">
+      <button class="mini cam" onclick="addPhoto('${r.id}')">📷 사진</button>
+      <button class="mini del" onclick="delRec('${r.id}')">🗑 삭제</button>
+    </div>
+  </div>`;
+}
+
+function renderAll(){
+  const a = calc('seeun'), b = calc('segang');
+  const lead = a.total === b.total ? null : (a.total > b.total ? 'seeun' : 'segang');
+  const card = (k, s) => { const v = KIDS[k]; return `
+    <button class="vs-card ${lead===k?'lead':''}" style="--kc:${v.c};--ks:${v.soft}" onclick="openStats('${k}')">
+      ${lead===k?'<span class="crown">👑</span>':''}
+      ${avatarHtml(k, true)}
+      <div class="vs-name">${v.name}</div>
+      <div class="vs-total ${cls(s.total)}">${signed(s.total)}<small>점</small></div>
+      <div class="vs-sub">상점 ${s.plusN}회 · 감점 ${s.minusN}회</div>
+    </button>`; };
+  const verdict = lead ? `${KIDS[lead].short}이가 ${Math.abs(a.total-b.total)}점 앞서고 있어요! 🏃` : (records.length ? '두 사람이 동점이에요! 🤝' : '아직 기록이 없어요 🌱');
+
+  const metrics = [
+    ['현재 점수', a.total, b.total, false],
+    ['상점 합계', a.plus, b.plus, false],
+    ['감점 합계', a.minus, b.minus, true],
+    ['상점 횟수', a.plusN, b.plusN, false],
+    ['감점 횟수', a.minusN, b.minusN, true],
+    ['이번 달', a.month, b.month, false]
+  ];
+  const bar = (val, max, kid, neg) => {
+    const w = max ? Math.abs(val)/max*100 : 0;
+    const col = (neg || val < 0) ? 'var(--minus)' : KIDS[kid].c;
+    return `<div class="bf-track"><div class="bf-bar" style="width:${w}%;background:${col}"></div></div>`;
+  };
+  const fmtVal = (label, v) => label.includes('횟수') ? v + '회' : signed(v);
+  let rows = metrics.map(([label, x, y, neg]) => {
+    const max = Math.max(Math.abs(x), Math.abs(y));
+    return `<div class="bf-row">
+      <div class="bf-side l"><span class="bf-val ${label.includes('횟수')?'':cls(x)}">${fmtVal(label,x)}</span>${bar(x,max,'seeun',neg)}</div>
+      <div class="bf-label">${label}</div>
+      <div class="bf-side r">${bar(y,max,'segang',neg)}<span class="bf-val ${label.includes('횟수')?'':cls(y)}">${fmtVal(label,y)}</span></div>
+    </div>`;
+  }).join('');
+
+  const recent = records.slice().sort(byRecent).slice(0,6);
+  const recentHtml = recent.length ? recent.map(r => `
+    <div class="rec" onclick="openStats('${r.child}')" style="cursor:pointer">
+      <div class="pts ${r.points>0?'plus':'minus'}">${signed(r.points)}</div>
+      <div class="rec-main">
+        <div class="rec-reason"><span class="mini-kid" style="background:${KIDS[r.child].c}">${KIDS[r.child].short}</span>${esc(r.reason)}</div>
+        <div class="rec-meta">${fmtDateLong(r.date)} · ${giverEmoji(r.giver)} ${esc(r.giver)}</div>
+      </div>
+    </div>`).join('') : '';
+
+  return `
+    <div class="vs">${card('seeun', a)}<div class="vs-mid">VS</div>${card('segang', b)}</div>
+    <div class="verdict">${verdict}</div>
+    <div class="card">
+      <div class="bf-legend"><span style="color:${KIDS.seeun.c}">◀ 이세은</span><span style="color:${KIDS.segang.c}">이세강 ▶</span></div>
+      ${rows}
+    </div>
+    ${recent.length ? `<h3 class="sec-title">최근 기록 <span>두 아이 함께</span></h3>${recentHtml}` : ''}`;
+}
+
+async function hydratePhotos(){
+  document.querySelectorAll('#statsBody img[data-pid]').forEach(async img => {
+    const v = await PhotoDB.get(img.dataset.pid);
+    if (v){
+      img.src = v; img.hidden = false;
+      const av = img.closest('.avatar'); if (av) av.classList.add('has-img');
+    } else if (!img.dataset.pid.startsWith('profile-')){
+      const t = img.closest('.thumb'); if (t) t.remove();
+    }
+  });
+}
+
+/* ================= 사진 ================= */
+let photoTarget = null, profileTarget = null, lbCurrent = null;
+function addPhoto(recId){ photoTarget = recId; $('#photoInput').value = ''; $('#photoInput').click(); }
+function pickProfile(k){ profileTarget = k; $('#profileInput').value = ''; $('#profileInput').click(); }
+
+$('#photoInput').addEventListener('change', async e => {
+  const files = [...e.target.files]; const rec = records.find(r => r.id === photoTarget);
+  if (!files.length || !rec) return;
+  $('#loading').classList.add('show');
+  let ok = 0;
+  for (const f of files){
+    try {
+      const data = await compressImage(f, 1280, 0.82);
+      const pid = 'ph-' + uid();
+      await PhotoDB.put(pid, data);
+      (rec.photos = rec.photos || []).push(pid); ok++;
+    } catch(err){ /* 지원하지 않는 형식 */ }
+  }
+  $('#loading').classList.remove('show');
+  saveRecords(); lastAdded = null; renderStats();
+  toast(ok ? `사진 ${ok}장을 올렸어요 📷` : '사진을 불러오지 못했어요 (JPG/PNG로 시도해 주세요)');
+});
+
+$('#profileInput').addEventListener('change', async e => {
+  const f = e.target.files[0]; if (!f || !profileTarget) return;
+  try {
+    const data = await compressImage(f, 480, 0.85);
+    await PhotoDB.put('profile-' + profileTarget, data);
+    lastAdded = null; renderStats(); toast('프로필 사진을 바꿨어요 😊');
+  } catch(err){ toast('사진을 불러오지 못했어요'); }
+});
+
+async function viewPhoto(recId, pid){
+  const v = await PhotoDB.get(pid); if (!v) return;
+  lbCurrent = { recId, pid }; $('#lbImg').src = v; $('#lightbox').classList.add('show');
+}
+function closeLightbox(){ $('#lightbox').classList.remove('show'); lbCurrent = null; }
+async function deletePhoto(){
+  if (!lbCurrent) return;
+  const cur = lbCurrent;
+  $('#lightbox').classList.remove('show');
+  if (!(await ask('이 사진을 삭제할까요?'))){ $('#lightbox').classList.add('show'); return; }
+  const rec = records.find(r => r.id === cur.recId);
+  if (rec) rec.photos = (rec.photos || []).filter(p => p !== cur.pid);
+  await PhotoDB.del(cur.pid); saveRecords(); lbCurrent = null; lastAdded = null; renderStats(); toast('사진을 삭제했어요');
+}
+
+/* ================= 기록 삭제 ================= */
+async function delRec(id){
+  const r = records.find(x => x.id === id); if (!r) return;
+  if (!(await ask(`${KIDS[r.child].name} · ${signed(r.points)}점\n"${r.reason}"\n이 기록을 삭제할까요?`))) return;
+  for (const p of (r.photos || [])) await PhotoDB.del(p);
+  records = records.filter(x => x.id !== id); saveRecords(); lastAdded = null; renderStats(); toast('기록을 삭제했어요');
+}
+
+/* ================= 공통 UI ================= */
+function openModal(id){ $('#'+id).classList.add('show'); }
+function closeModal(id){ $('#'+id).classList.remove('show'); }
+let askResolve = null;
+function ask(msg){ return new Promise(res => { $('#askMsg').textContent = msg; askResolve = res; openModal('askModal'); }); }
+function answer(v){ closeModal('askModal'); if (askResolve){ askResolve(v); askResolve = null; } }
+let toastTimer;
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// PC에서는 키보드로도 키패드 입력 가능
+document.addEventListener('keydown', e => {
+  if ($('#padModal').classList.contains('show')){
+    if (/^[0-9]$/.test(e.key)) padKey(e.key);
+    else if (e.key === 'Backspace') padKey('B');
+    else if (e.key === 'Enter') padOk();
+    else if (e.key === 'Escape') closeModal('padModal');
+  } else if (e.key === 'Escape'){
+    ['calModal'].forEach(closeModal); closeLightbox();
+  }
+});
+
+renderForm();
+</script>
+</body>
+</html>
